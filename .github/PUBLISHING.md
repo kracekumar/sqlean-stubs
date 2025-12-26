@@ -1,19 +1,83 @@
 # Publishing Guide
 
-This document describes how to build and publish the sqlean-stubs package to PyPI.
+This document describes how to build and publish the sqlean-stubs package to PyPI and GitHub.
 
-## Publishing with uv (Recommended)
+## Full Release Process
 
-The simplest way to build and publish:
+The simplest way to release:
 
 ```bash
-uv build && uv publish
+# Release using current version in pyproject.toml
+python release.py
+
+# Or specify a new version
+python release.py 0.0.3
 ```
 
 This will:
-1. Build the package (sdist and wheel)
-2. Prompt for PyPI credentials (or use `TWINE_USERNAME` and `TWINE_PASSWORD` env vars)
-3. Upload to PyPI
+1. Update version in `pyproject.toml` (if specified)
+2. Commit changes to git
+3. Push to origin
+4. Build the package (sdist and wheel)
+5. Publish to PyPI using `~/.pypirc` token
+6. Create a GitHub release
+
+## Prerequisites
+
+### PyPI Authentication
+
+1. Create `~/.pypirc`:
+```ini
+[distutils]
+index-servers =
+    pypi
+
+[pypi]
+username = __token__
+password = pypi-AgEIcHlwaS5vcmc...
+```
+
+2. Get token from https://pypi.org/manage/account/token/
+3. Replace `pypi-AgEIcHlwaS5vcmc...` with your actual token
+
+### GitHub Release (Optional)
+
+Install GitHub CLI to enable automatic GitHub release creation:
+
+```bash
+# macOS
+brew install gh
+
+# Linux
+# Visit https://cli.github.com/
+
+# Windows
+# Visit https://cli.github.com/
+```
+
+Authenticate:
+```bash
+gh auth login
+```
+
+## Manual Publishing
+
+For build and publish separately:
+
+```bash
+# Build only
+uv build
+
+# Publish to PyPI
+uv publish
+```
+
+Environment variables for publish (alternative to ~/.pypirc):
+```bash
+export TWINE_USERNAME=__token__
+export TWINE_PASSWORD=pypi-AgEIcHlwaS5vcmc...
+uv publish
+```
 
 ## Test Publishing
 
@@ -29,51 +93,32 @@ Then verify the package:
 pip install --index-url https://test.pypi.org/simple/ sqlean-stubs
 ```
 
-## Release Process
-
-1. Update version in `pyproject.toml` and `setup.py`:
-   ```bash
-   ./release.sh
-   ```
-
-2. Build and publish:
-   ```bash
-   uv build && uv publish
-   ```
-
-3. Verify on PyPI:
-   ```bash
-   pip install sqlean-stubs
-   # or visit https://pypi.org/project/sqlean-stubs/
-   ```
-
 ## Version Management
 
-The version is defined in two places (keep in sync):
-- `pyproject.toml`: `version = "0.0.1"`
-- `setup.py`: `version="0.0.1"`
+The version is defined in `pyproject.toml`:
+```toml
+version = "0.0.1"
+```
 
-Use `./release.sh` to automate version updates.
-
-## Authentication
-
-PyPI authentication options:
-1. Prompt at publish time (default)
-2. Environment variables:
-   ```bash
-   export TWINE_USERNAME=__token__
-   export TWINE_PASSWORD=pypi-xxx
-   uv publish
-   ```
-3. API token stored in `.pypirc` (see PyPI docs)
+You can:
+- Update manually, then run `python release.py`
+- Let release.py update it: `python release.py 0.0.2`
 
 ## Troubleshooting
 
-If publish fails, check:
-1. Version is valid (semantic versioning: X.Y.Z)
-2. Package name and classifiers are valid
-3. You have PyPI account and permissions
-4. Run `pip install twine` to get detailed error messages:
-   ```bash
-   python -m twine upload dist/*
-   ```
+### Release fails with "pyproject.toml not found"
+Ensure you're running from the repository root.
+
+### "PyPI token not found in ~/.pypirc"
+Check that `~/.pypirc` exists and has the correct format with `[pypi]` section and `password = pypi-...`
+
+### "GitHub CLI (gh) not found"
+Install gh from https://cli.github.com/ or run the release script without GitHub CLI (it will skip GitHub release creation).
+
+### Publishing fails with authentication error
+Ensure your PyPI token is valid at https://pypi.org/manage/account/token/
+
+## Version Constraints
+
+- Must use semantic versioning: `MAJOR.MINOR.PATCH` or `MAJOR.MINOR.PATCH-PRERELEASE`
+- Examples: `0.0.1`, `0.1.0`, `1.0.0-alpha`, `1.0.0-beta.1`

@@ -36,9 +36,12 @@
 - Quick check: `pytest -q`; coverage report via `tox`.
 
 ## Publishing & Releases
-- **Full release**: `./release.sh && uv build && uv publish`.
-- **Build**: `uv build`.
-- **Publish**: `uv publish`.
-- **Test publish**: `uv publish --publish-url https://test.pypi.org/legacy/`.
+- **Full release**: `python release.py [VERSION]` (updates version, commits, builds, publishes to PyPI, and creates GitHub release).
+  - With version: `python release.py 0.0.3` (updates to 0.0.3 and releases)
+  - Without version: `python release.py` (uses current version in pyproject.toml)
+- **Build only**: `uv build`.
+- **Publish only**: `uv publish`.
 - See `.github/PUBLISHING.md` for detailed instructions.
-- Versions defined in: `pyproject.toml` and `setup.py` (keep in sync via `./release.sh`).
+- Version defined in: `pyproject.toml`.
+- Authentication: Reads `~/.pypirc` token, uses `__token__` as username for PyPI.
+- GitHub release requires `gh` CLI installed (from https://cli.github.com/).
