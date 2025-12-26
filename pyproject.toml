@@ -28,8 +28,9 @@ classifiers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/nalgeon/sqlean.py"
-Documentation = "https://github.com/nalgeon/sqlean"
+Repository = "https://github.com/kracekumar/sqlean-stubs"
+Documentation = "https://github.com/kracekumar/sqlean-stubs"
+"Bug Tracker" = "https://github.com/kracekumar/sqlean-stubs/issues"
 
 [project.optional-dependencies]
 dev = [
