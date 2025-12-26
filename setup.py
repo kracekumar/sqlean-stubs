@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="sqlean-stubs",
-    version="3.50.4",
+    version="0.0.2",
     packages=find_packages(),
     package_data={
         "sqlean": ["py.typed"],
