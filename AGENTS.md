@@ -34,3 +34,18 @@
 - Location: place new tests in `tests/` alongside related module area.
 - Conventions: name files `test_<unit>.py`; use fixtures from `tests/conftest.py`.
 - Quick check: `pytest -q`; coverage report via `tox`.
+
+## Publishing & Releases
+- **Full release**: `./release.sh` (updates version, commits, tags, and prompts for GitHub release).
+- **Automated publishing**: Create GitHub release → CI/CD automatically publishes to PyPI.
+- **Manual build**: `./build.sh` or `python -m build`.
+- **Manual publish**: `python -m twine upload dist/*`.
+- **Test publish**: `python -m twine upload --repository testpypi dist/*`.
+- See `.github/PUBLISHING.md` for detailed instructions.
+- Versions defined in: `pyproject.toml` and `setup.py` (keep in sync).
+
+### GitHub Release Process
+1. Run `./release.sh` to update versions and create git tag
+2. Go to https://github.com/kracekumar/sqlean-stubs/releases
+3. Click "Publish release" for the created tag (or use `gh release create v0.0.2`)
+4. GitHub Actions automatically builds and publishes to PyPI
