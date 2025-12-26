@@ -28,7 +28,7 @@ def disable_all() -> None:
 
 def enable(*names: _ExtensionName) -> None:
     """Enable specific extensions.
-    
+
     Args:
         *names: Extension names to enable
             - 'crypto': Hashing, encoding and decoding data
@@ -48,7 +48,7 @@ def enable(*names: _ExtensionName) -> None:
 
 def disable(*names: _ExtensionName) -> None:
     """Disable specific extensions.
-    
+
     Args:
         *names: Extension names to disable
     """
