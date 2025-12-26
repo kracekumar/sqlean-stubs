@@ -51,29 +51,14 @@ fi
 echo "Committing changes..."
 git commit -m "Release version ${NEW_VERSION}" --allow-empty
 
-# Create git tag
-echo "Creating git tag ${TAG}..."
-if git rev-parse "${TAG}" >/dev/null 2>&1; then
-    echo -e "${RED}Error: Tag ${TAG} already exists${NC}"
-    exit 1
-fi
-
-git tag -a "${TAG}" -m "Release version ${NEW_VERSION}"
-
-# Push changes and tag
-echo "Pushing changes and tag..."
+# Push changes
+echo "Pushing changes..."
 git push origin main || git push origin master || true
-git push origin "${TAG}"
 
-echo -e "${GREEN}✓ Git push complete${NC}"
+echo -e "${GREEN}✓ Version updated and pushed${NC}"
 echo ""
-echo -e "${YELLOW}Manual steps remaining:${NC}"
-echo "1. Go to https://github.com/kracekumar/sqlean-stubs/releases"
-echo "2. Find the tag '${TAG}' and click 'Create release'"
-echo "3. Add release title and notes"
-echo "4. Click 'Publish release'"
+echo -e "${YELLOW}Next steps:${NC}"
+echo "1. Build and publish: uv build && uv publish"
 echo ""
-echo "Or use GitHub CLI:"
-echo "  gh release create ${TAG} --title 'Release ${NEW_VERSION}' --notes 'Release notes here'"
-echo ""
-echo -e "${GREEN}GitHub Actions will automatically publish to PyPI when release is published${NC}"
+echo "Or test publish to TestPyPI first:"
+echo "  uv build && uv publish --publish-url https://test.pypi.org/legacy/"

@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="sqlean-stubs",
-    version="0.0.2",
+    version="0.0.3",
     packages=find_packages(),
     package_data={
         "sqlean": ["py.typed"],
@@ -15,17 +15,17 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/nalgeon/sqlean.py",
     author="Type Hints Contributors",
-    license="Zlib",
+    license="zlib/libpng",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: Zlib License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Typing :: Typed",
     ],
 )
