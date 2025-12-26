@@ -1,14 +1,12 @@
 """Type checking tests for sqlean stubs."""
 
-import sys
 from typing import TYPE_CHECKING
+
 import sqlean
-from sqlean import dbapi2, extensions
+from sqlean import extensions
 
 # Only run actual type checks if mypy is available
 if TYPE_CHECKING:
-    from datetime import date, datetime, time
-    from typing import Optional, List
     import sqlean
 
 
@@ -43,7 +41,7 @@ def test_fetchone_returns_optional() -> None:
     row = cursor.fetchone()
     assert row is not None
     assert row[0] == 1
-    
+
     # Fetch again should return None
     row = cursor.fetchone()
     assert row is None
@@ -169,9 +167,10 @@ def test_row_factory_tuple() -> None:
 
 def test_row_factory_custom() -> None:
     """Test custom row factory."""
+
     def dict_factory(cursor: sqlean.Cursor, row: tuple) -> dict:
         return {desc[0]: val for desc, val in zip(cursor.description or [], row)}
-    
+
     conn = sqlean.connect(":memory:")
     conn.row_factory = dict_factory
     cursor = conn.execute("SELECT 1 AS num, 'text' AS txt")
@@ -254,10 +253,10 @@ def test_connection_context_manager() -> None:
 def test_create_function() -> None:
     """Test create_function."""
     conn = sqlean.connect(":memory:")
-    
+
     def double(x: int) -> int:
         return x * 2
-    
+
     conn.create_function("double", 1, double)
     cursor = conn.execute("SELECT double(21)")
     row = cursor.fetchone()
@@ -269,10 +268,10 @@ def test_create_function() -> None:
 def test_create_function_deterministic() -> None:
     """Test create_function with deterministic flag."""
     conn = sqlean.connect(":memory:")
-    
+
     def add_one(x: int) -> int:
         return x + 1
-    
+
     conn.create_function("add_one", 1, add_one, deterministic=True)
     cursor = conn.execute("SELECT add_one(41)")
     row = cursor.fetchone()
@@ -283,22 +282,23 @@ def test_create_function_deterministic() -> None:
 
 def test_create_aggregate() -> None:
     """Test create_aggregate."""
+
     class Sum:
         def __init__(self) -> None:
             self.value = 0
-        
+
         def step(self, x: int) -> None:
             self.value += x
-        
+
         def finalize(self) -> int:
             return self.value
-    
+
     conn = sqlean.connect(":memory:")
     conn.execute("CREATE TABLE test (val INTEGER)")
     conn.execute("INSERT INTO test VALUES (10)")
     conn.execute("INSERT INTO test VALUES (20)")
     conn.execute("INSERT INTO test VALUES (30)")
-    
+
     conn.create_aggregate("mysum", 1, Sum)
     cursor = conn.execute("SELECT mysum(val) FROM test")
     row = cursor.fetchone()
@@ -309,16 +309,17 @@ def test_create_aggregate() -> None:
 
 def test_create_collation() -> None:
     """Test create_collation."""
+
     def reverse_collation(a: str, b: str) -> int:
         return -((a > b) - (a < b))
-    
+
     conn = sqlean.connect(":memory:")
     conn.create_collation("reverse", reverse_collation)
     conn.execute("CREATE TABLE test (val TEXT)")
     conn.execute("INSERT INTO test VALUES ('a')")
     conn.execute("INSERT INTO test VALUES ('b')")
     conn.execute("INSERT INTO test VALUES ('c')")
-    
+
     rows = conn.execute("SELECT val FROM test ORDER BY val COLLATE reverse").fetchall()
     assert rows[0][0] == "c"
     assert rows[1][0] == "b"
@@ -328,9 +329,10 @@ def test_create_collation() -> None:
 
 def test_set_authorizer() -> None:
     """Test set_authorizer."""
+
     def authorizer(action: int, arg1: str, arg2: str, dbname: str, source: str) -> int:
         return sqlean.SQLITE_OK
-    
+
     conn = sqlean.connect(":memory:")
     conn.set_authorizer(authorizer)
     cursor = conn.execute("SELECT 1")
@@ -343,11 +345,11 @@ def test_set_authorizer() -> None:
 def test_set_progress_handler() -> None:
     """Test set_progress_handler."""
     calls = []
-    
+
     def progress() -> int:
         calls.append(True)
         return 0
-    
+
     conn = sqlean.connect(":memory:")
     conn.set_progress_handler(progress, 1)
     conn.execute("SELECT 1")
@@ -359,10 +361,10 @@ def test_set_progress_handler() -> None:
 def test_set_trace_callback() -> None:
     """Test set_trace_callback."""
     statements = []
-    
+
     def trace(statement: str) -> None:
         statements.append(statement)
-    
+
     conn = sqlean.connect(":memory:")
     conn.set_trace_callback(trace)
     conn.execute("SELECT 1")
@@ -402,12 +404,12 @@ def test_isolation_level() -> None:
 def test_in_transaction() -> None:
     """Test in_transaction property."""
     conn = sqlean.connect(":memory:")
-    assert conn.in_transaction == False
+    assert not conn.in_transaction
     conn.execute("CREATE TABLE test (id INTEGER)")
     conn.execute("INSERT INTO test VALUES (1)")
-    assert conn.in_transaction == True
+    assert conn.in_transaction
     conn.commit()
-    assert conn.in_transaction == False
+    assert not conn.in_transaction
     conn.close()
 
 
@@ -447,6 +449,7 @@ def test_date_from_ticks() -> None:
 def test_time_from_ticks() -> None:
     """Test TimeFromTicks."""
     from datetime import time
+
     t = sqlean.TimeFromTicks(0)
     # TimeFromTicks(0) gives time at UTC epoch (which is 1:00 for UTC+1 offset on some systems)
     assert isinstance(t, time)
