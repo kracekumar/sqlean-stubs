@@ -178,10 +178,17 @@ def commit_and_push(version: str) -> None:
     run_command("git add pyproject.toml")
     run_command(f'git commit -m "Bump version to {version}"')
 
-    # Try main first, then master
-    returncode, _, _ = run_command("git push origin main", check=False)
+    # Get current branch
+    returncode, branch, stderr = run_command("git rev-parse --abbrev-ref HEAD", check=False)
     if returncode != 0:
-        run_command("git push origin master")
+        print_error(f"Failed to get current branch: {stderr}")
+        sys.exit(1)
+
+    # Push to current branch
+    returncode, stdout, stderr = run_command(f"git push origin {branch}", check=False)
+    if returncode != 0:
+        print_error(f"Failed to push to {branch}: {stderr}")
+        sys.exit(1)
 
     print_success("Changes pushed")
 
