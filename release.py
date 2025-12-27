@@ -2,11 +2,11 @@
 """Release script for sqlean-stubs package."""
 
 import argparse
-import os
 import re
 import subprocess
 import sys
 from configparser import ConfigParser
+from configparser import Error as ConfigParserError
 from pathlib import Path
 
 
@@ -81,15 +81,15 @@ def validate_version(version: str) -> None:
 
 def read_pypi_token() -> str:
     """Read PyPI token from ~/.pypirc.
-    
+
     Expected format:
     [pypi]
     username = __token__
-    password = pypi-AgEIcHlwaS5vcmc...
+    password = pypi-...
     """
     pypirc = Path.home() / ".pypirc"
     if not pypirc.exists():
-        print_error(f"~/.pypirc not found. Please create it with your PyPI token.\n")
+        print_error("~/.pypirc not found. Please create it with your PyPI token.\n")
         print("Expected format:")
         print("[pypi]")
         print("username = __token__")
@@ -107,24 +107,24 @@ def read_pypi_token() -> str:
         if "pypi" not in config.sections():
             print_error("No [pypi] section found in ~/.pypirc")
             sys.exit(1)
-        
+
         if not config.has_option("pypi", "password"):
             print_error("No 'password' option found in [pypi] section of ~/.pypirc")
             sys.exit(1)
-        
+
         token = config.get("pypi", "password")
-        
+
         if not token or not isinstance(token, str):
             print_error("PyPI token is empty or invalid in ~/.pypirc")
             sys.exit(1)
-        
+
         # Validate token starts with 'pypi-'
         if not token.startswith("pypi-"):
             print_error("PyPI token should start with 'pypi-'. Check ~/.pypirc")
             sys.exit(1)
-        
+
         return token.strip()
-    except ConfigParser.Error as e:
+    except ConfigParserError as e:
         print_error(f"Failed to read PyPI token from ~/.pypirc: {e}")
         sys.exit(1)
 
@@ -140,27 +140,27 @@ def publish_to_pypi(token: str) -> None:
     """Publish package to PyPI."""
     print("Publishing to PyPI...")
     print("(Authenticating using PyPI token from ~/.pypirc)\n")
-    
+
     # Use uv publish with username and password flags
     cmd = f'uv publish --username __token__ --password "{token}"'
     run_command(cmd)
-    
+
     print_success("Published to PyPI")
 
 
 def create_github_release(version: str) -> None:
     """Create a GitHub release."""
     print("Creating GitHub release...")
-    
+
     # Check if gh CLI is available
     returncode, _, _ = run_command("which gh", check=False)
     if returncode != 0:
         print(f"{Colors.YELLOW}⚠ GitHub CLI (gh) not found. Skipping GitHub release creation.{Colors.RESET}")
         print(f"{Colors.YELLOW}  Install from https://cli.github.com/{Colors.RESET}\n")
         return
-    
+
     tag = f"v{version}"
-    
+
     # Create release
     run_command(
         f'gh release create {tag} --title "Release {version}" '
@@ -173,14 +173,14 @@ def create_github_release(version: str) -> None:
 def commit_and_push(version: str) -> None:
     """Commit and push changes."""
     print("Committing and pushing changes...")
-    run_command(f'git add pyproject.toml')
+    run_command('git add pyproject.toml')
     run_command(f'git commit -m "Bump version to {version}"')
-    
+
     # Try main first, then master
     returncode, _, _ = run_command("git push origin main", check=False)
     if returncode != 0:
         run_command("git push origin master")
-    
+
     print_success("Changes pushed")
 
 
@@ -215,7 +215,7 @@ Examples:
         new_version = read_version_from_pyproject()
         print(f"{Colors.YELLOW}Release Configuration:{Colors.RESET}")
         print(f"  pyproject.toml version: {new_version}\n")
-    
+
     # Validate version format
     validate_version(new_version)
 
@@ -239,9 +239,9 @@ Examples:
     # Summary
     print_header("Release Complete!")
     print(f"{Colors.GREEN}Version {new_version} released successfully!{Colors.RESET}\n")
-    print(f"Verify on PyPI:")
+    print("Verify on PyPI:")
     print(f"  pip install sqlean-stubs=={new_version}")
-    print(f"  https://pypi.org/project/sqlean-stubs/\n")
+    print("  https://pypi.org/project/sqlean-stubs/\n")
 
 
 if __name__ == "__main__":
