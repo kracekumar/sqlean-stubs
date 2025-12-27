@@ -19,25 +19,50 @@ uv add sqlean-stubs
 Type hints enable IDE autocomplete and type checking for sqlean code:
 
 ```python
+from typing import Optional
 import sqlean
 
-conn: sqlean.Connection = sqlean.connect(":memory:")
-cursor = conn.cursor()
+def main_sqlean():
+    print("Hello from try-sqlean-stubs!")
+    conn: sqlean.Connection = sqlean.connect(":memory:")
+    cursor: sqlean.Cursor = conn.cursor()
 
-# Type hints work with parameters
-cursor.execute("SELECT * FROM users WHERE id = ?", (1,))
+    # Create repos table
+    cursor.execute("""
+        CREATE TABLE repos (
+            id INTEGER PRIMARY KEY,
+            package_name TEXT NOT NULL,
+            github_url TEXT NOT NULL
+        )
+    """)
 
-# fetchone() returns Optional[Any]
-row = cursor.fetchone()
-if row is not None:
-    print(row[0])  # Type-safe indexing
+    # Insert test data
+    cursor.execute(
+        "INSERT INTO repos (package_name, github_url) VALUES (?, ?)",
+        ("sqlean.py", "https://github.com/nalgeon/sqlean.py")
+    )
+    cursor.execute(
+        "INSERT INTO repos (package_name, github_url) VALUES (?, ?)",
+        ("sqlean-stubs", "https://github.com/kracekumar/sqlean-stubs")
+    )
 
-# User-defined functions
-def double(x: int) -> int:
-    return x * 2
+    # Query the table
+    cursor.execute("SELECT * FROM repos")
 
-conn.create_function("double", 1, double)
-conn.close()
+    # fetchone() returns Optional[Any]
+    row: Optional[sqlean.Row] = cursor.fetchone()
+    if row is not None:
+        print(f"ID: {row[0]}, Package: {row[1]}, URL: {row[2]}")
+
+    # User-defined functions
+    def double(x: int) -> int:
+        return x * 2
+
+    conn.create_function("double", 1, double)
+    conn.close()
+
+if __name__ == "__main__":
+    main_sqlean()
 ```
 
 **Benefits:**
