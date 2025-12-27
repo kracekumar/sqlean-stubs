@@ -68,7 +68,7 @@ def read_version_from_pyproject() -> str:
 
 def update_version_in_pyproject(new_version: str) -> None:
     """Update version in pyproject.toml using uv."""
-    run_command(f'uv version {new_version}')
+    run_command(f"uv version {new_version}")
     print_success(f"Updated version to {new_version}")
 
 
@@ -155,7 +155,9 @@ def create_github_release(version: str) -> None:
     # Check if gh CLI is available
     returncode, _, _ = run_command("which gh", check=False)
     if returncode != 0:
-        print(f"{Colors.YELLOW}⚠ GitHub CLI (gh) not found. Skipping GitHub release creation.{Colors.RESET}")
+        print(
+            f"{Colors.YELLOW}⚠ GitHub CLI (gh) not found. Skipping GitHub release creation.{Colors.RESET}"
+        )
         print(f"{Colors.YELLOW}  Install from https://cli.github.com/{Colors.RESET}\n")
         return
 
@@ -173,7 +175,7 @@ def create_github_release(version: str) -> None:
 def commit_and_push(version: str) -> None:
     """Commit and push changes."""
     print("Committing and pushing changes...")
-    run_command('git add pyproject.toml')
+    run_command("git add pyproject.toml")
     run_command(f'git commit -m "Bump version to {version}"')
 
     # Try main first, then master

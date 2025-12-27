@@ -50,6 +50,7 @@ dev = [
     "ruff>=0.1.0",
     "tox>=4.0",
     "sqlean.py>=3.50",
+    "prek>=0.2.25",
 ]
 
 [tool.setuptools]
