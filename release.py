@@ -176,7 +176,14 @@ def commit_and_push(version: str) -> None:
     """Commit and push changes."""
     print("Committing and pushing changes...")
     run_command("git add pyproject.toml")
-    run_command(f'git commit -m "Bump version to {version}"')
+
+    # Commit with check=False to handle pre-commit hooks
+    returncode, stdout, stderr = run_command(
+        f'git commit -m "Bump version to {version}"', check=False
+    )
+    if returncode != 0:
+        print_error(f"Git commit failed (possibly due to pre-commit hooks): {stderr}")
+        sys.exit(1)
 
     # Get current branch
     returncode, branch, stderr = run_command("git rev-parse --abbrev-ref HEAD", check=False)
