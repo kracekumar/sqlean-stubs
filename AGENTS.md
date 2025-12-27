@@ -36,16 +36,12 @@
 - Quick check: `pytest -q`; coverage report via `tox`.
 
 ## Publishing & Releases
-- **Full release**: `./release.sh` (updates version, commits, tags, and prompts for GitHub release).
-- **Automated publishing**: Create GitHub release → CI/CD automatically publishes to PyPI.
-- **Manual build**: `./build.sh` or `python -m build`.
-- **Manual publish**: `python -m twine upload dist/*`.
-- **Test publish**: `python -m twine upload --repository testpypi dist/*`.
+- **Full release**: `python release.py [VERSION]` (updates version, commits, builds, publishes to PyPI, and creates GitHub release).
+  - With version: `python release.py 0.0.3` (updates to 0.0.3 and releases)
+  - Without version: `python release.py` (uses current version in pyproject.toml)
+- **Build only**: `uv build`.
+- **Publish only**: `uv publish`.
 - See `.github/PUBLISHING.md` for detailed instructions.
-- Versions defined in: `pyproject.toml` and `setup.py` (keep in sync).
-
-### GitHub Release Process
-1. Run `./release.sh` to update versions and create git tag
-2. Go to https://github.com/kracekumar/sqlean-stubs/releases
-3. Click "Publish release" for the created tag (or use `gh release create v0.0.2`)
-4. GitHub Actions automatically builds and publishes to PyPI
+- Version defined in: `pyproject.toml`.
+- Authentication: Reads `~/.pypirc` token, uses `__token__` as username for PyPI.
+- GitHub release requires `gh` CLI installed (from https://cli.github.com/).
