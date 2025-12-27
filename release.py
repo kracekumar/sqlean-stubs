@@ -221,12 +221,14 @@ Examples:
     print_header("SQLean-Stubs Release")
 
     # Get or validate version
+    version_updated = False
     if args.version:
         validate_version(args.version)
         new_version = args.version
         print(f"{Colors.YELLOW}Release Configuration:{Colors.RESET}")
         print(f"  Target version: {new_version}\n")
         update_version_in_pyproject(new_version)
+        version_updated = True
     else:
         new_version = read_version_from_pyproject()
         print(f"{Colors.YELLOW}Release Configuration:{Colors.RESET}")
@@ -235,8 +237,9 @@ Examples:
     # Validate version format
     validate_version(new_version)
 
-    # Commit and push
-    commit_and_push(new_version)
+    # Commit and push only if version was updated
+    if version_updated:
+        commit_and_push(new_version)
 
     # Build package
     build_package()
